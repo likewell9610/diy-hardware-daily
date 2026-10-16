@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DIY 硬件日报 · 按类目整理</title>
+<style>
+  :root {
+    --bg: #0c1018;
+    --panel: #161c28;
+    --panel2: #111722;
+    --line: #2a3444;
+    --text: #e8eef8;
+    --text2: #b4bfce;
+    --text3: #748096;
+    --accent: #00c4ff;
+    --warn: #ff5c5c;
+    --good: #4ade80;
+    --gold: #fac450;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: "Microsoft YaHei", "PingFang SC", -apple-system, "Segoe UI", sans-serif;
+    line-height: 1.7; padding: 28px 20px 60px;
+  }
+  .wrap { max-width: 980px; margin: 0 auto; }
+  header { border-bottom: 1px solid var(--line); padding-bottom: 18px; margin-bottom: 22px; }
+  h1 { font-size: 26px; font-weight: 700; letter-spacing: .5px; }
+  h1 .bar { display:inline-block; width:6px; height:22px; background: var(--accent); border-radius:2px; margin-right:10px; vertical-align:-3px; }
+  .sub { color: var(--text3); font-size: 13px; margin-top: 6px; }
+  .toolbar { display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin:18px 0 8px; }
+  .btn {
+    border:1px solid var(--line); background:var(--panel); color:var(--text2);
+    padding:7px 14px; border-radius:8px; cursor:pointer; font-size:13px; transition:.15s;
+  }
+  .btn:hover { border-color: var(--accent); color: var(--text); }
+  .btn.active { border-color: var(--accent); color: var(--accent); background: rgba(0,196,255,.08); }
+  .day-tab { font-size:14px; padding:8px 18px; }
+
+  .day-marker { margin: 26px 0 14px; padding: 10px 16px; background: var(--panel2); border-radius: 10px;
+    font-size: 15px; font-weight: 700; color: var(--accent); border-left: 4px solid var(--accent); }
+  .day-window { color: var(--text3); font-size: 12px; margin: -6px 0 10px; padding-left: 1px; }
+  .day-note { color: var(--text2); font-size: 13px; background: var(--panel2); border-radius: 8px;
+    padding: 10px 14px; margin: 0 0 18px; border-left: 3px solid var(--gold); }
+
+  .section { margin-bottom: 34px; }
+  .sec-head { display:flex; align-items:center; gap:10px; margin-bottom: 14px; }
+  .sec-head .dot { width:9px; height:9px; border-radius:50%; background: var(--accent); box-shadow:0 0 0 4px rgba(0,196,255,.12); }
+  .sec-head h2 { font-size: 19px; font-weight: 700; }
+  .sec-head .n { color: var(--text3); font-size: 13px; font-weight: 400; }
+
+  .grid { display:grid; grid-template-columns: 1fr; gap: 16px; }
+  .card {
+    background: var(--panel); border-radius: 14px; padding: 18px 20px 16px;
+    border-left: 4px solid var(--accent); position: relative;
+  }
+  .card .title { font-size: 17px; font-weight: 700; margin-bottom: 10px; line-height: 1.5; color: var(--text); }
+  .card .fact { color: var(--text); font-size: 14px; margin-bottom: 8px; }
+  .card .fact.time { color: var(--text3); font-size: 12.5px; }
+  .card .fact.time .tlabel { display:inline-block; color: var(--accent); font-size: 11px; border:1px solid var(--accent);
+    border-radius: 4px; padding: 0 5px; margin-right: 7px; vertical-align: 1px; }
+
+  .field { display:flex; gap:10px; margin-top: 9px; font-size: 13.5px; }
+  .field .flabel { flex-shrink:0; font-weight: 700; font-size: 12.5px; padding-top: 1px; white-space:nowrap; }
+  .field .fbody { color: var(--text2); }
+  .field.why .flabel { color: var(--accent); }
+  .field.advice .flabel { color: var(--good); }
+  .field.cred .flabel { color: var(--gold); }
+
+  .tablewrap { margin: 12px 0 4px; overflow-x:auto; border: 1px solid var(--line); border-radius: 8px; }
+  table.tbl { border-collapse: collapse; width: 100%; font-size: 12.5px; }
+  table.tbl th, table.tbl td { border-bottom: 1px solid var(--line); padding: 7px 10px; text-align:left; vertical-align: top; }
+  table.tbl th { background: var(--panel2); color: var(--text); font-weight: 600; white-space: nowrap; }
+  table.tbl td { color: var(--text2); }
+  table.tbl tr:last-child td { border-bottom: none; }
+
+  .srcnote { color: var(--text3); font-size: 12px; margin-top: 8px; }
+  .card .links { margin-top: 10px; padding-top: 9px; border-top: 1px dashed var(--line); display:flex; flex-wrap:wrap; gap:6px 12px; align-items:baseline; font-size:12px; }
+  .card .links .l-label { color: var(--text3); }
+  .card .links a { color: var(--accent); text-decoration: none; }
+  .card .links a:hover { text-decoration: underline; }
+  .card a { color: var(--accent); text-decoration: none; }
+  .card a:hover { text-decoration: underline; }
+
+  .htmlsec { background: var(--panel2); border-radius: 12px; padding: 16px 20px; font-size: 14px; color: var(--text2); }
+  .htmlsec p { margin-bottom: 8px; }
+  .htmlsec blockquote { border-left: 3px solid var(--accent); padding: 4px 0 4px 14px; margin: 8px 0; color: var(--text3); font-size: 13px; }
+  .htmlsec a { color: var(--accent); text-decoration: none; }
+  .htmlsec a:hover { text-decoration: underline; }
+  .ol-item { display:flex; gap:10px; padding: 7px 0; border-bottom: 1px dashed var(--line); }
+  .ol-item:last-child { border-bottom: none; }
+  .ol-item .ol-num { color: var(--good); font-weight: 700; flex-shrink:0; }
+  .todo-item { padding: 7px 0 7px 24px; position: relative; border-bottom: 1px dashed var(--line); color: var(--text2); }
+  .todo-item:last-child { border-bottom: none; }
+  .todo-item::before { content:""; position:absolute; left:2px; top:13px; width:10px; height:10px;
+    border:1.5px solid var(--text3); border-radius:3px; }
+
+  .empty { color: var(--text3); font-size: 13px; padding: 6px 2px; }
+  footer { margin-top: 40px; color: var(--text3); font-size: 12px; border-top: 1px solid var(--line); padding-top: 16px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1><span class="bar"></span>DIY 硬件日报 · 按类目整理</h1>
+    <div class="sub">从主板品牌方视角整理的完整日报内容，按「主板 / 成本与供给 / 游戏 / 生产力 / AI / 显示器 / 过滤 / 结论 / 追踪」分区，每条含全字段与来源链接</div>
+  </header>
+
+  <div class="toolbar day-switch" id="daySwitch"></div>
+
+  <div id="content"></div>
+
+  <footer>从主板品牌方视角整理 · 每日自动累积更新</footer>
+</div>
+
+<script>
+window.DIGESTS = [
+    {
+        "dateLabel":  "2026-10-13（周一）",
+        "window":  "窗口：北京时间 10/13 00:00 — 10/14 09:00（覆盖不完整）",
+        "note":  "DIY 硬件日报 · 省流版（补录）",
+        "sections":  [
+                         {
+                             "title":  "主板部分",
+                             "kind":  "items",
+                             "items":  [
+                                           {
+                                               "title":  "技嘉宣布 Z790 / B760 / H610 全系新 BIOS，支持 LGA1700 下一代处理器",
+                                               "facts":  [
+                                                             "【时间】原始发布 10/13（美东），中文媒体 10/14 起扩散",
+                                                             "覆盖 DDR5 与 DDR4 两种内存版本，支持页标注“为即将到来的处理器做准备”；目标处理器即传闻中的 Raptor Lake Next（Intel 7、最高 8C+12c、传 2027 初）。技嘉口径称业内首家在三大 700 系芯片组上实现全覆盖；此前 10/9 已先公布 B760 / H610。"
+                                                         ],
+                                               "why":  "这是“平台寿命营销”的第一枪。“换 U 不换板不换内存”在 DDR5 高价周期是唯一还能刺激出货的故事，谁先把兼容清单铺满谁先吃存量红利；技嘉未承诺 Z690 / B660，此为该差异点。",
+                                               "links":  [
+                                                             {
+                                                                 "text":  "IT之家",
+                                                                 "url":  "https://www.ithome.com/1/013/097.htm"
+                                                             },
+                                                             {
+                                                                 "text":  "秋叶原 Hermitage",
+                                                                 "url":  "https://www.gdm.or.jp/pressrelease/2026/1014/656140"
+                                                             }
+                                                         ]
+                                           },
+                                           {
+                                               "title":  "首块 LGA1954 + Q970/B960 工业板亮相（Decenta M26-NVLS-ATX09）",
+                                               "facts":  [
+                                                             "【时间】原始 10/13 17:02（快科技）",
+                                                             "全尺寸 ATX，LGA1954，Q970 / B960 双芯片组 SKU；4×DDR5-6400（双通道，最大 256GB）；1×PCIe 5.0 x16 可拆 x8/x8 + 4×PCIe 5.0 x4；3×M.2 Key-M + 1×Key-E（Wi-Fi 7）；含传统 PCI 插槽。爆料口径：Q970 有 8 条 PCIe 5.0 通道、B960 无 Gen5 通道。"
+                                                         ],
+                                               "why":  "下一代插槽与 900 系命名首次以实物主板落地，NPI 时钟可倒排；“B960 无 PCIe 5.0”预示入门 SKU 定位被压低，价格带需提前重做。",
+                                               "links":  [
+                                                             {
+                                                                 "text":  "超能网",
+                                                                 "url":  "https://www.expreview.com/108656.html"
+                                                             },
+                                                             {
+                                                                 "text":  "太平洋电脑网/快科技",
+                                                                 "url":  "https://news.pconline.com.cn/2183/21835352.html"
+                                                             }
+                                                         ]
+                                           },
+                                           {
+                                               "title":  "OCP 2026 + 工控两条前置信号：永擎 Diamond Rapids 板、映泰 Wildcat Lake 工控板",
+                                               "facts":  [
+                                                             "【时间】OCP 会期 10/13–10/14；映泰 10/13 前后",
+                                                             "永擎 DMRD16-2L+：SSI-EEB，16CH 1DPC DDR5、12800MT/s MRDIMM、16×MCIO 8i（PCIe Gen6 / CXL Gen3）、AST2700 BMC。映泰 BIWCL-PAT：基于 Intel Wildcat Lake，面向边缘计算与 AIoT，三屏 4K。"
+                                                         ],
+                                               "why":  "服务器与工控正在抢走高多层 PCB、Gen6 走线、VRM 与 BMC 的产能与工程人力，间接推高消费板成本与交期；二线品牌转向工控，消费渠道竞争强度下降。",
+                                               "links":  [
+                                                             {
+                                                                 "text":  "IT之家（永擎）",
+                                                                 "url":  "https://www.ithome.com/1/013/178.htm"
+                                                             },
+                                                             {
+                                                                 "text":  "快科技（映泰）",
+                                                                 "url":  "https://news.mydrivers.com/1/1157/1157380.htm"
+                                                             }
+                                                         ]
+                                           }
+                                       ]
+                         },
+                         {
+                             "title":  "其他装机相关",
+                             "kind":  "items",
+                             "items":  [
+                                           {
+                                               "title":  "英特尔为 4–6 代至强推出推理微服务：自动检测硬件并配置 vLLM",
+                                               "facts":  [
+                                                             "【时间】IT之家 10/14（早间时段，原始时间待核）",
+                                                             "容器化推理微服务，自动检测硬件并应用预验证的 vLLM 参数配置，免去手动调优；未来延伸至英特尔 GPU 平台且接口一致。"
+                                                         ],
+                                               "why":  "把本地推理门槛压到通用 x86，需求或从“必须买 GPU”扩散到“CPU + 大内存”路线，放大对内存容量与通道数的需求，是 DDR5 高价周期里少数能讲增量的方向。",
+                                               "links":  [
+                                                             {
+                                                                 "text":  "IT之家",
+                                                                 "url":  "https://www.ithome.com/1/013/130.htm"
+                                                             }
+                                                         ]
+                                           }
+                                       ]
+                         },
+                         {
+                             "title":  "本期未采用的信息 · 覆盖说明",
+                             "html":  "\u003cli\u003e本期为“覆盖不完整”补录：联网搜索接口当期不可用（401），无法回溯 10/13 全天行情，故显示器 / 游戏 / 成本类条目暂缺，仅录入已核实的 4 条主板与 AI 类信息。\u003c/li\u003e\u003cli\u003e内存 / 显卡 / 显示器行情、游戏发售与配置要求：本应进入 10/13 窗口，但因搜索受限未核实到当日数据，待搜索恢复后补录，不凭记忆硬凑。\u003c/li\u003e\u003cli\u003e涉及具体涨跌幅、销量或出货目标的数字：无当日可核验来源，暂不引用。\u003c/li\u003e"
+                         }
+                     ],
+        "id":  "2026-10-13",
+        "label":  "2026-10-13（周一）"
+    },
+    {
+        "dateLabel":  "2026-10-15（周四）",
+        "window":  "北京时间 2026-10-14 00:00 — 2026-10-15 09:00",
+        "note":  "",
+        "preamble":  "",
+        "sections":  [
+                         {
+                             "title":  "一、主板品牌直接竞争动态（第一优先级）",
+                             "kind":  "items",
+                             "items":  [
+                                           {
+                                               "title":  "技嘉把 LGA1700 新 CPU 支持扩到 Z790 全系，成为\"700 系三芯片组全覆盖\"首家",
+                                               "facts":  [
+                                                             "技嘉在 10 月 13 日（美东时间）发新闻稿，为 Z790 / B760 / H610 全部型号提供新版 BIOS（支持页标注 \"Preparation for upcoming processor support\"），DDR4 与 DDR5 版本都在范围内；此前 10 月 9 日已先公布 B760 / H610。技嘉官方口径称自己是业内首家在三大 700 系芯片组上实现全面兼容的厂商。新 CPU 即爆料中的 \"Raptor Lake Next\"，沿用 Intel 7 与 Raptor Cove + Gracemont，传闻 2027 年初发布、最高 8P+12E，TDP 65–125W，但**未获 Intel 官方确认**。",
+                                                             "【时间】原始发布 2026-10-13（美东）；中文媒体在窗口内集中报道（IT之家 10-14 21:04、Hermitage 秋叶原 10-13 配信 / 10-14 更新）。"
+                                                         ],
+                                               "links":  [
+                                                             {
+                                                                 "text":  "IT之家",
+                                                                 "url":  "https://www.ithome.com/1/013/097.htm"
+                                                             },
+                                                             {
+                                                                 "text":  "搜狐/IT之家转载全文",
+                                                                 "url":  "https://www.sohu.com/a/1087787914_114760"
+                                                             },
+                                                             {
+                                                                 "text":  "Hermitage 秋叶原",
+                                                                 "url":  "https://www.gdm.or.jp/pressrelease/2026/1014/656140"
+                                                             },
+                                                             {
+                                                                 "text":  "原文",
+                                                                 "url":  "https://www.gigabyte.com/press/news/2463"
+                                                             }
+                                                         ],
+                                               "why":  "这不是一条\"BIOS 更新\"，而是一次**平台寿命营销的抢跑**。DDR5 价格处在历史高位时，\"老平台换 CPU 不换板不换内存\"是唯一还能刺激出货的故事；谁先把兼容名单铺满，谁就先吃到存量 LGA1700 用户的换 U 需求和渠道补货。技嘉把 Z790 也纳入（而不是只留入门 B760/H610），说明它要覆盖的不只是低价段，而是整条 700 系库存。",
+                                               "advice":  "① 立即核对自家 600/700 系（含 Z690 / B660）能否给出同等承诺——技嘉公告**没有**承诺 Z690 / B660，这是我方可以打的差异点，但必须先拿到 CPU 微码授权与验证资源；② 渠道话术改为\"换 U 不换板\"，把 DDR4 版主板库存和这句卖点绑定；③ BIOS 发放节奏要配合渠道，不要出现\"官网有、装机店不知道\"的断层。",
+                                               "source_note":  "技嘉新闻稿（官方站点，抓取被 CDN 拒绝，仅作引用）"
+                                           },
+                                           {
+                                               "title":  "业界首款 Q970 / B960 + LGA1954 主板亮相，适配 Nova Lake-S（工业板先行）",
+                                               "facts":  [
+                                                             "工业板厂商 Decenta（德承）上架 M26-NVLS-ATX09 全尺寸 ATX 主板，LGA1954 插槽，提供 Q970 / B960 两种芯片组 SKU；4 条 DDR5-6400 UDIMM、双通道、最大 256GB；1 条 PCIe 5.0 x16（可拆 x8/x8）+ 4 条 PCIe 5.0 x4；保留传统 PCI 插槽；3 个 M.2 Key-M、1 个 Key-E；VGA/HDMI/DP 三显、TPM 2.0。爆料口径：Q970 提供 8 条 PCIe 5.0 通道、B960 无芯片组 PCIe 5.0 通道。",
+                                                             "【时间】原始 2026-10-13 17:02（快科技），10-14 在硬件圈二次扩散。**属于窗口边缘条目，需注意。**"
+                                                         ],
+                                               "links":  [
+                                                             {
+                                                                 "text":  "超能网",
+                                                                 "url":  "https://www.expreview.com/108656.html"
+                                                             },
+                                                             {
+                                                                 "text":  "太平洋电脑网/快科技",
+                                                                 "url":  "https://news.pconline.com.cn/2183/21835352.html"
+                                                             }
+                                                         ],
+                                               "why":  "这是 **LGA1954 第一次以实物主板形态出现**，等于提前确认了下一代桌面插槽与 900 系芯片组的命名与通道规格。对主板品牌方的意义在于：新品导入（NPI）时钟可以倒排了——PCB 层数/供电/内存走线方案、BIOS 团队资源、渠道清库存节奏都要围绕 2027 年的 Nova Lake-S 排期提前准备；同时\"B960 无 PCIe 5.0 通道\"意味着入门 SKU 的定位会被进一步压低，价格带设计要重做。",
+                                               "advice":  "把 Q970/B960 的通道规格差异当作入门–主流段规划基线；同时注意工业板先行往往意味着消费板会在 Q4–Q1 之间密集预热，市场部要提前准备 Nova Lake 平台的卖点素材。",
+                                               "source_note":  "（页面正文抓取为空，仅可确认标题与来源）"
+                                           },
+                                           {
+                                               "title":  "永擎（ASRock Rack）在 OCP 2026 展出 Diamond Rapids 服务器板：16 通道 DDR5、16 个 PCIe Gen6 MCIO",
+                                               "facts":  [
+                                                             "DMRD16-2L+，SSI-EEB 板型，支持 16CH 1DPC DDR5、兼容 12800MT/s MRDIMM；16 个 MCIO 8i（PCIe Gen6 / CXL Gen3）；1 个 PCIe Gen5 x4 M.2 启动盘位；板载 ASPEED AST2700 BMC、双 1GbE。",
+                                                             "【时间】IT之家 2026-10-15 09:03（**窗口内**，原始来源为永擎官方社媒 @ASROCKRACK）。"
+                                                         ],
+                                               "links":  [
+                                                             {
+                                                                 "text":  "IT之家",
+                                                                 "url":  "https://www.ithome.com/1/013/178.htm"
+                                                             },
+                                                             {
+                                                                 "text":  "ASRock Rack on X",
+                                                                 "url":  "https://x.com/ASROCKRACK/status/2110281519692698046"
+                                                             }
+                                                         ],
+                                               "why":  "它不属于消费 DIY，但它决定了**未来 2–3 年主板行业的成本与资源分配**：16 通道内存、Gen6 走线、MRDIMM、CXL 都在抢高多层 PCB、高速连接器、VRM 与 BMC 的产能和工程人力。消费板 BOM 与交期是被这些项目间接推高的。",
+                                               "advice":  "把服务器/工控板的物料与工程排期纳入消费板的供应风险表；Gen6 走线经验（材料、阻抗、连接器）要向消费高端线做技术下沉储备。",
+                                               "source_note":  "原始信源"
+                                           },
+                                           {
+                                               "title":  "七彩虹官宣 iGame X870E ULTRA-S（V14）：第四款 X870E，主打内存超频与扩展",
+                                               "facts":  [
+                                                             "ATX、8 层低损耗 PCB；16+2+1 相 80A DrMOS、FCC 电感、10K 黑金电容、双 EPS 8-Pin；独立时钟芯片；扩展卡与 M.2 快拆；80 Debug 数显 + EZ Debug；官方称 DDR5 可超 8400+ MT/s，并展示 48GB×4 @6600 CL28 过测（192GB）；2 条 PCIe 插槽拆分后可挂 5 个 M.2，另有 4× SATA；RTL8126-CG 5GbE + MT7925 Wi-Fi 7；2× USB-C 40Gbps；支持 X3D AI 高帧模式。",
+                                                             "【时间】IT之家 2026-10-15 09:16（**窗口边缘，刚过 9:00**，按\"当天早间\"处理并标注）。"
+                                                         ],
+                                               "links":  [
+                                                             {
+                                                                 "text":  "IT之家",
+                                                                 "url":  "https://www.ithome.com/1/013/183.htm"
+                                                             }
+                                                         ],
+                                               "why":  "**大陆品牌在 AM5 高端段的持续加码**。当内存价格高企、整机预算被压缩时，高端主板的卖点正从\"堆供电\"转向\"能不能把大容量内存跑稳\"——48GB×4 @6600 CL28 这类实测就是针对\"买一次内存用五年\"的消费心理。8 层低损耗 PCB + 独立时钟芯片也是成本上行的直接体现（见第二部分的 PCB 成本项）。",
+                                               "advice":  "高端 AM5 产品的宣传重点从峰值频率转向**大容量四 DIMM 的过测清单**（用户真实配置是 2×32/2×48/4×48）；把 QVL 与\"过测截图\"变成渠道物料，这是当下最有效的差异化。"
+                                           },
+                                           {
+                                               "title":  "TechPowerUp 首发评测：技嘉 X870 Aorus Infinity（800 美元，X870 而非 X870E）",
+                                               "facts":  [
+                                                             "超频向 E-ATX，顶部横置双 DIMM（最大 128GB，标称 DDR5-11400 OC），18 相 110A VRM，双 BIOS，2× 5GbE + Wi-Fi 7，4× M.2（2 个 Gen5）。TPU 结语：SSD 与 VRM 温度优秀、内存超频潜力胜过大多数主板，但**未用 X870E**（对手 ROG Crosshair X870E Apex / MSI X870E Unify-X Max 都是 X870E），且 800 美元比 Apex 首发价还贵 50 美元，叠加内存天价，竞争力受质疑。",
+                                                             "【时间】TechPowerUp 2026-10-14（**窗口内**）。"
+                                                         ],
+                                               "links":  [
+                                                             {
+                                                                 "text":  "TechPowerUp 评测",
+                                                                 "url":  "https://www.techpowerup.com/review/gigabyte-x870-aorus-infinity/"
+                                                             }
+                                                         ],
+                                               "why":  "第三方权威评测直接给出\"超频板定价天花板已到\"的判断，这对所有做高端超频 SKU 的品牌都是价格带预警：在内存成本占整机比例创历史新高的周期里，**800 美元级主板的市场容量在收缩**，宁可把资源放在 200–400 美元的主流段做内存兼容性口碑。",
+                                               "advice":  "重新审视高端超频 SKU 的立项数与定价；把评测关注点引到\"内存稳、M.2 温控好\"这两项用户可感知指标上。"
+                                           },
+                                           {
+                                               "title":  "映泰推出 BIWCL-PAT 工业主板（Wildcat Lake，三屏 4K）",
+                                               "facts":  [
+                                                             "基于 Intel \"Wildcat Lake\" 的工业单板计算机，面向边缘计算/AIoT，支持三屏 4K 输出。",
+                                                             "【时间】2026-10-14 前后（快科技 / 中关村在线，**窗口内**；真实性可核）。"
+                                                         ],
+                                               "links":  [
+                                                             {
+                                                                 "text":  "快科技",
+                                                                 "url":  "https://news.mydrivers.com/1/1157/1157380.htm"
+                                                             },
+                                                             {
+                                                                 "text":  "中关村在线",
+                                                                 "url":  "https://ai.zol.com.cn/1260/12602977.html"
+                                                             }
+                                                         ],
+                                               "why":  "二线主板品牌在消费 DIY 萎缩时把增量押在工控/AIoT，这是行业结构性信号——它同时意味着二线品牌在消费渠道的声量与资源会继续下降。",
+                                               "advice":  "把映泰等二线的渠道退守纳入竞争地图；在 B2B/IPC 线是否跟进，需要用毛利与账期模型单独算，不要用消费板逻辑套。"
+                                           }
+                                       ]
+                         },
+                         {
+                             "title":  "二、成本与供给侧（决定定价、BOM 与出货目标的硬约束）",
+                             "kind":  "items",
+                             "items":  [
+                                           {
+                                               "title":  "DDR4 三个月涨 24%，涨幅反超 DDR5；短缺可能延续到 2029",
+                                               "facts":  [
+                                                             "巴克莱报告：10 月 DDR5 现货较上季 +8%，三个月累计 +20%；DDR4 同期 +4%、三个月 +24%，**反超 DDR5**。美光口径称全球存储短缺可能持续到 2029 年；花旗预测 DRAM 缺口在 2027Q4 达峰（13.9%），NAND 缺口 2028Q1 达峰（8.3%）。报告同时指出缺货已开始迫使部分芯片设计商降规格，产业重新采用上一代规格（文中直接点名技嘉 B760/H610 支持 LGA1700 新 U + DDR4 一事）；南亚科表示 DDR5 仅占其营收约 10%，不急于提高 DDR5 比重。",
+                                                             "【时间】2026-10-14（深圳电子商会转载钜亨网，**窗口内**）。"
+                                                         ],
+                                               "links":  [
+                                                             {
+                                                                 "text":  "深圳电子商会（钜亨网）",
+                                                                 "url":  "https://wap.seccw.com/index.php/Index/detail/id/51151.html"
+                                                             },
+                                                             {
+                                                                 "text":  "AET 电子技术应用",
+                                                                 "url":  "http://chinaaet.cn/article/3000181034"
+                                                             },
+                                                             {
+                                                                 "text":  "EEPW",
+                                                                 "url":  "https://www.eepw.com.cn/article/202610/484030.htm"
+                                                             }
+                                                         ],
+                                               "why":  "**这是过去 24 小时对主板产品线最\"可执行\"的一条。** DDR4 涨幅超过 DDR5，意味着\"用 DDR4 主板给用户省钱\"这个卖点正在被削弱，我方的 DDR4 SKU（H610/B760/A620 等）需求预测必须重算：可能出现\"用户想省钱但 DDR4 也不便宜\"的两头挤压，最终把需求推向\"不换机\"。",
+                                               "advice":  "① 重做 DDR4 与 DDR5 版本的需求拆分与备货，按周滚动，而不是按季度锁量；② 与内存模组厂谈 DDR4 颗粒/模组的**配套供货**（主板+内存套装），把渠道库存风险变成联合促销；③ 在 PR 口径上不要过度承诺\"升级省钱\"。"
+                                           },
+                                           {
+                                               "title":  "Intel / AMD / 高通 CPU 全线涨价，Panther Lake 高端 SKU 涨幅最大",
+                                               "facts":  [
+                                                             "供应链消息（21ic 转载\"芯硬件\"）：Intel 自去年底起三轮涨价——一季度约 +10%、7 月酷睿 +十几到几十美元（至强最高超 1000 美元）、**9 月 1 日起第三轮**，其中 Panther Lake 高端/大核显型号涨幅最高达 15–20%，Meteor Lake / Arrow Lake +5–10%，Alder Lake / Twin Lake +10–20%；AMD 约 +10%（产品线、生效时间不确定）；高通骁龙 X / X2 Elite 约 +10%。根因指向台积电 9 月中旬通知客户代工报价上调约 10%。",
+                                                             "【时间】2026-10-14 15:00（搜狐/新浪财经转 21ic，**窗口内**）。"
+                                                         ],
+                                               "links":  [
+                                                             {
+                                                                 "text":  "搜狐（新浪财经/21ic）",
+                                                                 "url":  "https://www.sohu.com/a/1087637526_122014422"
+                                                             },
+                                                             {
+                                                                 "text":  "EEWorld",
+                                                                 "url":  "https://en.eeworld.com.cn/news/szds/eic738066.html"
+                                                             }
+                                                         ],
+                                               "why":  "CPU 涨价 + 内存涨价 + PCB 涨价是**三重叠加**。主板作为平台\"最不涨价\"的一环，会被渠道用来做促销锚点；但 BOM 端我方无法独善其身。更关键的是：CPU 涨价会推迟换机决策，主板出货目标需要更为保守的假设。",
+                                               "credibility":  "**供应链传闻级**——非厂商官方公告，具体 SKU 幅度不可作为报价依据；但多家媒体交叉引用、方向一致。",
+                                               "advice":  "把\"CPU+内存\"成本曲线做成渠道沟通材料，用总拥有成本（TCO）解释为什么\"现在买主板不亏\"；同时准备\"平台延期发布\"情景下的产品生命周期延长方案（更长 BIOS 支持周期、更多 OS 兼容验证）。"
+                                           },
+                                           {
+                                               "title":  "显存/PCB 成本上行：AMD 自 10 月 1 日起上调 GDDR6 供货价",
+                                               "facts":  [
+                                                             "PCGamer 报道并经国内媒体转述：AMD 自 10 月 1 日起向合作厂商上调 GDDR6 供货价格，板卡成本上行压力或传导至终端；同时 PCB 基板、电源 IC 等配套元器件同步涨价。消息来自供应链爆料，AMD 未公开公告。",
+                                                             "【时间】2026-10-14 02:03（17173 转游民星空，**窗口内**）。"
+                                                         ],
+                                               "links":  [
+                                                             {
+                                                                 "text":  "17173（转游民星空/PCGamer）",
+                                                                 "url":  "https://news.17173.com/content/10142026/020359337.shtml"
+                                                             }
+                                                         ],
+                                               "why":  "显存与 PCB/电源 IC 同时涨价，直接压缩\"主板+显卡\"的套装预算空间。主板品牌做整机/套装的渠道方案时，显卡侧的涨价会吃掉主板的让利空间。",
+                                               "credibility":  "**爆料级**，需与 AMD 供货政策二次确认。"
+                                           },
+                                           {
+                                               "title":  "高端 Z890 主板官方降价一半，X870E 便宜 34%（价格体系紊乱风险）",
+                                               "facts":  [
+                                                             "XFastest 报道高阶 Z890 主板官方降价约 50%、X870E 约 34%。",
+                                                             "【时间】需按窗口核对（检索命中，日期未在页面确认）。"
+                                                         ],
+                                               "links":  [
+                                                             {
+                                                                 "text":  "XFastest",
+                                                                 "url":  "https://www.xfastest.com/thread-305658-1-16.html"
+                                                             }
+                                                         ],
+                                               "why":  "在 BOM 上行的周期里出现**官方腰斩**，通常是清库存或为下一代平台让路。对主板品牌方而言，这意味着渠道价格体系与二手残值预期会被打乱，影响老平台\"换 U 不换板\"的吸引力——用户会想\"再等等，板子还会降\"。",
+                                               "credibility":  "**待核**（地区与型号范围未确认），建议本周内跟进确认。"
+                                           },
+                                           {
+                                               "title":  "Intel 锐炫 Pro B70 一个月涨 48%",
+                                               "facts":  [
+                                                             "国内报道 Intel Arc Pro B70 工作站卡一个月内价格上涨约 48%，被形容为\"理财产品\"。",
+                                                             "【时间】窗口内（C114 等转述）。"
+                                                         ],
+                                               "links":  [
+                                                             {
+                                                                 "text":  "C114",
+                                                                 "url":  "https://www.c114.net.cn/chipnews/111578.html"
+                                                             }
+                                                         ],
+                                               "why":  "大显存工作站卡因内存涨价被动升值，说明**\"显存容量=资产\"**的定价逻辑正在形成。对主板品牌的内容创作/工作站整机方案，BOM 成本与报价有效期都需要缩短（建议报价有效期从 30 天缩到 7–14 天）。",
+                                               "credibility":  "媒体转述，需与渠道价核实。"
+                                           }
+                                       ]
+                         },
+                         {
+                             "title":  "三、游戏与生产力（装机需求的拉动项）",
+                             "kind":  "items",
+                             "items":  [
+                                           {
+                                               "title":  "NVIDIA 发布 DLSS 5 新模型：推理速度翻倍、4K 显存占用 -20%，10 月 16 日上线",
+                                               "facts":  [
+                                                             "模型参数量压缩 24%（约 1.18 亿），4K 下显存占用降低 20%，推理速度较 9 月版翻倍（较 3 月 GTC 首次演示累计提速约 10 倍）；官方称游戏帧率最高提升至 1.4 倍，但明确\"推理耗时减半≠帧率翻倍\"。10 月 16 日上线，首发适配 NBA 2K27，支持 RTX 50 系桌面卡、RTX Spark 笔记本与 GeForce NOW；后续成为所有 DLSS 5 游戏默认方案——《霍格沃茨之遗》11 月 5 日、《燕云十六声》11 月下旬；RTX Remix 支持 10 月 23 日。另据报道，《燕云十六声》为全国首款支持 DLSS 5 的游戏（与网易/英伟达合作）。",
+                                                             "【时间】2026-10-14（17173 10:01、ZOL 12:40，**窗口内**）；上线时间 10-16。"
+                                                         ],
+                                               "links":  [
+                                                             {
+                                                                 "text":  "17173",
+                                                                 "url":  "https://news.17173.com/content/10142026/100159682.shtml"
+                                                             },
+                                                             {
+                                                                 "text":  "中关村在线",
+                                                                 "url":  "https://ai.zol.com.cn/1260/12602056.html"
+                                                             },
+                                                             {
+                                                                 "text":  "ZOL：DLSS 5 与帧生成 C 模式",
+                                                                 "url":  "https://ai.zol.com.cn/1260/12601480.html"
+                                                             },
+                                                             {
+                                                                 "text":  "36氪：《燕云十六声》支持 DLSS 5",
+                                                                 "url":  "https://36kr.com/newsflashes/4025386927525762"
+                                                             }
+                                                         ],
+                                               "why":  "**这是当下唯一能直接拉动中高端装机需求的技术事件。** 显存占用 -20% 对\"显存不够\"的中端卡是实质利好，也给\"买中端卡 + 大显存需求\"的用户一个不换显卡的理由——对主板品牌来说，意味着中端平台（B850/B860 级别）的装机咨询量会在 10 月中下旬有波动，可配合做套装促销。",
+                                               "advice":  "把 DLSS 5 上线日（10-16）与双十一预热绑定，做\"主板+中端卡\"套装；在 QVL/BIOS 优化话术里强调 PCIe 与内存延迟对 1% Low 的影响（帧生成放大 CPU 侧延迟问题）。"
+                                           },
+                                           {
+                                               "title":  "Win11 十月累积更新 KB5127648：修好了音频崩溃，却带出企业/校园 Wi-Fi 断连",
+                                               "facts":  [
+                                                             "KB5127648（面向 24H2 / 25H2 / 26H2）修复了 9 月可选更新 KB5124010 导致的 AC-3 解码崩溃（msmpeg2ac3dec.dll 触发、播放音乐或调音量闪退）；但同期反馈该补丁导致使用 WPA 802.1X PEAP 认证的企业与校园 Wi-Fi 无法连接，临时方案为把 `HKLM\\SYSTEM\\CurrentControlSet\\Control\\Lsa\\MSV1_0\\BlockNtlmv1SSO` 设为 0 或通过组策略下发。IT之家另有\"微软承认部分 Win11 设备不兼容 10 月更新导致远程桌面故障\"的报道。",
+                                                             "【时间】NeoWin/BornCity 原始博文均为 2026-10-14（**窗口内的原始报道**）；IT之家成稿为 10-15 上午。"
+                                                         ],
+                                               "links":  [
+                                                             {
+                                                                 "text":  "IT之家（Wi-Fi 故障）",
+                                                                 "url":  "https://www.ithome.com/1/013/247.htm"
+                                                             },
+                                                             {
+                                                                 "text":  "IT之家（音频修复）",
+                                                                 "url":  "https://www.ithome.com/1/013/193.htm"
+                                                             },
+                                                             {
+                                                                 "text":  "IT之家（远程桌面不兼容）",
+                                                                 "url":  "https://www.ithome.com/1/013/220.htm"
+                                                             }
+                                                         ],
+                                               "why":  "对主板品牌方的**售后与客诉**直接相关：企业/校园批量采购场景下，网卡驱动 + 系统补丁组合问题会被归因到\"主板网卡有毛病\"。Wi-Fi 7 主板（MT7925/RTL8922 等）当下正值铺货期，客诉量上升会污染新品口碑。",
+                                               "advice":  "① 客服与技术支持立即准备\"KB5127648 + 企业 Wi-Fi\"排查话术与注册表方案；② 官网支持页上线\"10 月补丁已知问题\"专区；③ 与网卡/模组厂同步驱动版本，避免驱动与补丁双重叠加。"
+                                           },
+                                           {
+                                               "title":  "NVIDIA 停止为 Windows 10 提供新 Game Ready 驱动",
+                                               "facts":  [
+                                                             "NVIDIA 结束 Windows 10 的 Game Ready 驱动支持（原定 2025-10-14，延后一年），最后一批 GRD 在 10 月上线；2029 年 10 月前仍提供关键安全驱动更新。",
+                                                             "【时间】原始报道 2026-10-12（BGR），10 月中旬持续发酵（**窗口边缘，作为背景项**）。"
+                                                         ],
+                                               "links":  [
+                                                             {
+                                                                 "text":  "BGR",
+                                                                 "url":  "https://www.bgr.com/2284580/nvidia-rtx-gpu-windows-10-drivers-october/"
+                                                             }
+                                                         ],
+                                               "why":  "Windows 10 存量用户会面临\"新游戏 + 旧驱动\"的稳定性风险，这部分人群恰是\"换 U 不换板 / 换板不换机\"的存量盘。主板品牌可在渠道端用\"Win11 + 新驱动\"话术推动整机更新，但要注意 Win10 用户价格敏感度高。"
+                                           },
+                                           {
+                                               "title":  "《战争机器：事变日》：光追关不掉，GTX 10 系及更早显卡\"进不去门\"",
+                                               "facts":  [
+                                                             "本作把硬件光追（光追阴影/反射/全局光照 + RTX Mega Geometry）做成**常开项，画质菜单里没有\"关光追\"这一档**。官方三档配置都要求硬件支持光追的显卡：最低档（1080p/中）RTX 5050、RTX 2060、RX 6600 或 RX 9060 + 6GB 显存 + 12GB 内存；推荐档（1440p/高）RTX 5060、RTX 3060 Ti、RX 6700 XT 或 RX 9060 XT + 8GB；极致档（4K/极致）RTX 5070 Ti 或 RX 9070 XT + 12GB；三档均需 SSD、115GB 空间，支持 DLSS 4.5 / FSR 4 / XeSS 3.0，内置跑分模式。",
+                                                             "实测与调校要点（ZOL 测试，10-14）：RTX 5080 + i7-14700K，1440p 极致 + DLSS Native 约 80 帧、过场 90 帧、GPU 占用仅一半；2560×1600 极致 + DLSS Native 关帧生成平均 53 帧，改动态超分后回到 88 帧。**DLSS 预设 K 比默认 M/L 高约 12–14%**（94/87/84 帧 vs 92/84/81 帧）且噪点更少。已知问题：CPU 占用偏高（Ryzen 7 9850X3D 上 80–90%，可开 Low Core 模式缓解）、内存占用摸到 16–20GB、偶发崩溃。",
+                                                             "口碑与销量：Metacritic 88 / OpenCritic 87，IGN 与 ScreenRant 均 9/10，系列十余年评价最高；但第三方估算首周约 23 万份（Steam 16.8 万 + Xbox 6.2 万），同期约 170 万人通过 Game Pass 玩到，Steam 首周峰值同时在线 3.15 万——**口碑好、买断销量弱，首发进订阅制稀释了\"首周销量\"指标**。",
+                                                             "【时间】游戏 2026-10-06 发售（首发即进 Game Pass）；**ZOL 硬件向深度分析 2026-10-14 18:05（窗口内）**；光追门槛官方口径与媒体实测在 10 月上旬（**原始发布早于窗口，作为背景标注**）。"
+                                                         ],
+                                               "links":  [
+                                                             {
+                                                                 "text":  "ZOL：《战争机器：事变日》：一款不给光追留退路的 3A（10-14）",
+                                                                 "url":  "https://diy.zol.com.cn/1260/12603313.html"
+                                                             },
+                                                             {
+                                                                 "text":  "MIXED：光追关不掉、Steam Deck 性能不足",
+                                                                 "url":  "https://mixed-news.com/en/gears-of-war-e-day-ray-tracing-always-on-steam-deck-performance/"
+                                                             },
+                                                             {
+                                                                 "text":  "Yahoo Tech：需支持光追的 GPU",
+                                                                 "url":  "https://tech.yahoo.com/gaming/articles/gears-war-e-day-requires-134609522.html"
+                                                             },
+                                                             {
+                                                                 "text":  "网易/17173：需光追显卡与 115GB SSD",
+                                                                 "url":  "https://news.17173.com/content/10022026/120054699.shtml"
+                                                             }
+                                                         ],
+                                               "why":  "这是\"**光追从画质选项变成硬件门槛**\"的第一个 3A 样本，已进入\"能不能玩\"的范畴。它会直接淘汰 GTX 10 系/16 系与不支持硬件光追的老卡用户，把这部分人的升级决策从\"再等等 DDR5 降价\"变成\"必须换平台\"——**这是当下最硬的换机催化剂**。同时 CPU 占用 80–90%、内存 16–20GB 说明：光追时代瓶颈在 CPU 与内存子系统，主板侧的供电稳定性、内存容量与延迟调校的价值被放大。",
+                                               "credibility":  "配置表与口碑＝官方/权威聚合（Metacritic、IGN）；销量＝第三方估算，微软未公布。",
+                                               "advice":  "① 渠道端做\"光追门槛自查\"工具/话术：老卡用户按型号一键判断能不能玩，直接导向主板+CPU+内存套装；② 高端板的内存容量（32GB 起）与低延迟预设应作为卖点写进物料，配合\"16–20GB 占用\"的真实数据；③ 关注 Low Core 模式这类\"CPU 侧补救\"设计与 BIOS 调度优化的结合点。"
+                                           },
+                                           {
+                                               "title":  "《地铁 2039》PC 配置\"虚高\"风波：推荐配置写 RTX 4090 + 64GB DDR5，官方澄清为误传",
+                                               "facts":  [
+                                                             "Epic 游戏商城页面一度更新《地铁 2039》PC 配置：**推荐配置 RTX 4090、64GB DDR5、i9-14900KS 或 Ryzen 9 7950X3D**；最低配置 i5-14600K 或 Ryzen 7 5800X3D + 16GB DDR5 + RTX 3060 + 135GB 空间。随后官方在社交媒体说明该配置为**误上传内容**，正在修正，最终要求将在临近发售时公布。",
+                                                             "【时间】2026-10-14 20:40（ZOL，**窗口内**）。"
+                                                         ],
+                                               "links":  [
+                                                             {
+                                                                 "text":  "ZOL：地铁 2033 续作 PC 配置被曝虚高，官方澄清为误传",
+                                                                 "url":  "https://news.zol.com.cn/1260/12603499.html"
+                                                             },
+                                                             {
+                                                                 "text":  "360游戏：《地铁 2039》PC 配置太高吓坏玩家，官方回应",
+                                                                 "url":  "https://360game.360.cn/article/content?id=6acf51ebb8583c401802b0d2"
+                                                             }
+                                                         ],
+                                               "why":  "这是一次典型的\"配置门槛通胀\"舆情。在 DDR5 涨价的节点上，\"64GB DDR5 才够推荐\"这种信息会**直接扭曲装机需求**（用户被吓到去堆内存），而内存每涨一次价，主板预算就被挤一次。对主板品牌的含义是：不要跟着这种未定稿的门槛做物料；反而可以把\"16GB 起步、32GB 舒适\"作为理性预期来引导。",
+                                               "credibility":  "初始配置＝商场页面误上传（已澄清）；最终配置＝待公布。"
+                                           },
+                                           {
+                                               "title":  "《奇点灰烬 II》定档 11 月 10 日：老牌\"硬件杀手\"续作回归",
+                                               "facts":  [
+                                                             "Stardock 与 Oxide Games 于 10-14 联合宣布，《奇点灰烬 II》11 月 10 日登陆 Steam 与官网；标准版 39.99 美元、豪华版 69.99 美元。初代是首款原生 DX12 游戏，以数万单位同屏的 CPU 压力著称。",
+                                                             "【时间】原始 2026-10-14（公告）；IT之家成稿 10-15 11:02（超窗口，标注）。"
+                                                         ],
+                                               "links":  [
+                                                             {
+                                                                 "text":  "IT之家",
+                                                                 "url":  "https://www.ithome.com/1/013/259.htm"
+                                                             }
+                                                         ],
+                                               "why":  "它是**评估\"多核 CPU + 内存带宽\"的代表性基准级作品**，同时又恰逢\"换 U 不换板\"周期——如果续作继续吃满多核，会强化\"老平台换新 U 就能续命\"的说服力，对 LGA1700/AM4 存量用户是利好叙事。",
+                                               "advice":  "等发售后的多核评测，把\"你的老板子能带得动新 U\"做成内容营销素材。"
+                                           },
+                                           {
+                                               "title":  "GTA 6 评测节奏：评测版 10 月底前发放，评测禁令 11 月 19 日发售日解除",
+                                               "facts":  [
+                                                             "在持续泄密背景下，Insider Gaming 称媒体评测禁令将在 11 月 19 日（发售日）前解除；可靠消息源 NateTheHate 称**评测版会在 10 月底前发放**。游戏不提供 Xbox/PS5 实体光盘，降低泄露面。多数玩家预估主线时长 50 小时以上，地图规模超 Rockstar 以往作品。",
+                                                             "【时间】IT之家 2026-10-15 10:00（**超窗口 9:00，按当天早间处理并标注**）。"
+                                                         ],
+                                               "links":  [
+                                                             {
+                                                                 "text":  "IT之家",
+                                                                 "url":  "https://m.ithome.com/html/1013200.htm"
+                                                             }
+                                                         ],
+                                               "why":  "GTA 6 是**2026 年最大的 PC 装机话题蓄水池**（即便 PC 版尚未官宣具体档期，评测解禁与发售热度会外溢到整机咨询）。10 月底评测版发放意味着热度会从 11 月初开始持续爬升到 11 月 19 日。",
+                                               "advice":  "把 11 月上旬–中旬的促销节奏与 GTA 6 热度窗口对齐，物料预埋\"整机能不能跑\"的配置建议。"
+                                           },
+                                           {
+                                               "title":  "平台与行业侧：Steam 客户端大更新；任天堂《时之笛》重制版定档 11/5；育碧关闭 RedLynx 并裁员",
+                                               "facts":  [
+                                                             "Steam 客户端大更新（10-14）：大屏幕模式为重点，屏保功能向所有用户开放（含致敬 DVD 弹跳 Logo 的复古屏保）、启动性能改进、Remote Play 新增实验性低延迟编解码器 Pyrowave、Linux 侧一批修复。对 Steam Machine / Steam Deck 生态是正向信号。出处：[17173/游民星空](https://news.17173.com/content/10142026/140138889.shtml)",
+                                                             "任天堂《塞尔达传说：时之笛》完全重制版（10-14 公布）：11 月 5 日登陆 Switch 2，全语音过场、交响乐、麦克风\"哼唱陶笛\"玩法与\"陨落英雄之殿\"重战系统，实体版限量特殊工艺包装。对 PC DIY 无直接影响，但它与《霍格沃茨之遗》（11/5）撞期，**11 月第一周是游戏与硬件双重密集期**。出处：[18183 10 月 14 日要闻回顾](https://m.18183.com/news/yxxw/202610/9059578_3.html)｜[4Gamers](https://www.4gamers.com.tw/news/detail/82631/zelda-ocarina-of-time-remake-switch-2-release-date-november-5-2026)",
+                                                             "育碧计划关闭芬兰 RedLynx 工作室、新加坡裁员 70 人（10-14）：行业收缩仍在继续。出处：[17173](https://news.17173.com/content/10142026/200404969.shtml)｜[网易](https://www.163.com/dy/article/L97RJS0J0526D8LR.html)",
+                                                             "窗口内 Steam 新作：《战锤 40K：爆矢枪 2》（10-14 发售，国区首发 83.7 元，最低 GTX 980 / R9 Fury，推荐仅 GTX 1650 / RX 570，13GB）、[《太吾异世劫》](https://www.ithome.com/1/013/229.htm)（10-15 抢先体验，国区 30.40 元，最低 UHD 770）、[《查无此地》](https://news.17173.com/content/10142026/191559590.shtml)。共同点是**门槛极低**——与《事变日》形成两极：一边是\"老卡进不去\"，一边是\"核显就能玩\"，说明 PC 市场正在按硬件门槛分层。"
+                                                         ],
+                                               "links":  [
+
+                                                         ]
+                                           }
+                                       ]
+                         },
+                         {
+                             "title":  "三·补一｜AI 相关（本期临时补录，下期起纳入固定抓取范围）",
+                             "kind":  "items",
+                             "items":  [
+                                           {
+                                               "title":  "Rambus 发布面向 LPDDR6 SOCAMM2 内存模组的 PMIC",
+                                               "facts":  [
+                                                             "Rambus 发布针对**基于 LPDDR6 的 SOCAMM2** 模组的 PMIC 芯片。现有 SOCAMM2 产品均基于 LPDDR5X，Rambus 此时布局 LPDDR6 SOCAMM2，为后续生态扩展铺路。",
+                                                             "【时间】IT之家 2026-10-15 09:35（**窗口边缘**，快讯）。"
+                                                         ],
+                                               "links":  [
+                                                             {
+                                                                 "text":  "IT之家",
+                                                                 "url":  "https://www.ithome.com/1/013/190.htm"
+                                                             }
+                                                         ],
+                                               "why":  "SOCAMM2 是 AI PC / 小型工作站把\"大容量 + 低功耗\"内存搬到主板侧的形态。PMIC 先行意味着 **LPDDR6 模组化路线在提速**——如果 SOCAMM2 从笔电/边缘设备走向桌面与 MoDT 主板，主板的 DIMM 布局、供电与走线设计会出现一次结构性变化（LPDDR 焊死/模组化 vs 传统 UDIMM）。同时它是\"内存涨价周期里另一条降本/上量路径\"的信号。",
+                                               "advice":  "把 SOCAMM2/LPDDR6 纳入下一代 MoDT 与小型工作站主板的前瞻评估（先做 DFM 与供电可行性，不必立刻立项）；与内存厂确认 2027 年 LPDDR6 模组供货节奏。"
+                                           },
+                                           {
+                                               "title":  "英特尔为四至六代至强推出推理微服务：自动检测硬件并配置 vLLM 参数",
+                                               "facts":  [
+                                                             "英特尔面向 4–6 代至强推出容器化推理微服务，可自动检测硬件、应用预验证配置参数，免去手动调优；官方称未来将延伸至英特尔 GPU 平台，接口保持不变。",
+                                                             "【时间】IT之家 2026-10-14（**窗口内**）。"
+                                                         ],
+                                               "links":  [
+                                                             {
+                                                                 "text":  "IT之家",
+                                                                 "url":  "https://www.ithome.com/1/013/130.htm"
+                                                             }
+                                                         ],
+                                               "why":  "这是\"**把 AI 推理门槛压到通用 x86 平台**\"的动作。对主板品牌的含义是：本地推理的装机需求可能从\"必须买 GPU\"扩散到\"CPU + 大内存\"路线，从而放大对**内存容量与内存通道数**的需求——这直接支撑高端主板（4 DIMM、大容量、稳定过测）的卖点，也是 DDR5 高价周期里少数能讲增量的方向。",
+                                               "advice":  "为 CPU-only 推理场景准备\"容量优先\"的 QVL 与整机方案（例如 2×48GB/2×64GB 稳定过测清单、内存散热与长时间负载验证），并把这套方案推给做本地 AI 的小型集成商。"
+                                           }
+                                       ]
+                         },
+                         {
+                             "title":  "三·补二｜显示器（成本变动 + 窗口内新品）",
+                             "kind":  "items",
+                             "items":  [
+                                           {
+                                               "title":  "成本端：三大面板厂发出 10 月调价函，Q4 面板从\"持平\"转向\"试探性上涨\"",
+                                               "facts":  [
+                                                             "① 京东方、TCL 华星、惠科已向客户发出液晶显示器调价函，叠加国庆控产稳价，面板定价权进一步向中国大陆集中（原始报道 10 月初）；② **TrendForce 10 月 6 日**口径：Q4 显示器（MNT）面板需求预计环比 **-8%**（弱于三季度），但上游元器件成本全面上涨使面板厂几无降价空间，品牌客户基本认同稳价，**10 月 MNT 面板价格预估全面持平**；面板厂正观察电视面板涨价能否成功，若成立将为 MNT 涨价铺路。",
+                                                             "得物平台上泰坦军团某款三个月从 482 元涨到 547 元（约 +13.5%）；京东某 KTC 型号自 9/10 起从 1064 元低点升至 1199.7 元（约 +12.7%）。洛图科技口径：8 月线上电竞屏成交均价 1168 元，同比 +7%。成本链条被拆为：玻璃基板/驱动 IC/偏光片涨价 + 面板厂控产 → 面板调价函 → 零售价上行；而真正的\"发动机\"是存储（NOR Flash 上半年合约价 +100~120%、SLC NAND +130~150%，DRAM 二季度合约价环比 +58~63%，为近 15 年单季最大涨幅），根源是 AI 抢占成熟制程产能。",
+                                                             "【时间】TrendForce 报告 2026-10-06；国内调价函报道 10 月上旬；零售端传导报道在窗口内持续发酵。**属窗口边缘，作为成本背景处理并已标注。**"
+                                                         ],
+                                               "links":  [
+                                                             {
+                                                                 "text":  "TrendForce（10 月上旬面板价格）",
+                                                                 "url":  "https://www.trendforce.com/news/2026/10/06/insights-early-october-panel-prices-mnt-nb-stay-flat-despite-weak-demand-as-component-costs-rise-tv-also-holds-steady/"
+                                                             },
+                                                             {
+                                                                 "text":  "SID China：涨价潮蔓延至零售端",
+                                                                 "url":  "https://sidchina.cn/nd.jsp?id=2808\u0026groupId=8"
+                                                             },
+                                                             {
+                                                                 "text":  "SID China：京东方 10 月调价函",
+                                                                 "url":  "https://sidchina.cn/nd.jsp?fromColId=-1\u0026id=2807\u0026_ngc=-1\u0026groupId=8"
+                                                             },
+                                                             {
+                                                                 "text":  "ZOL：显示器全品类涨价，电竞屏均价同比 +7%",
+                                                                 "url":  "https://diy.zol.com.cn/1250/12500218.html"
+                                                             },
+                                                             {
+                                                                 "text":  "LEDinside：面板厂集体发函",
+                                                                 "url":  "https://www.ledinside.cn/news/20261008-62726.html"
+                                                             },
+                                                             {
+                                                                 "text":  "东方财富：涨价的风吹到显示器市场",
+                                                                 "url":  "https://finance.eastmoney.com/a/202609223881311929.html"
+                                                             }
+                                                         ],
+                                               "why":  "这是内存/PCB 之外的**第三条成本曲线**。整机预算被两头挤压——显示器涨价 + 内存暴涨，用户要么延后装机，要么削减主板预算，对中高端主板不利。",
+                                               "credibility":  "面板厂调价函＝产业链消息（未见公开函件）；TrendForce/洛图＝调研机构数据。",
+                                               "advice":  "① 做\"主板 + CPU + 内存\"套装促销时，把显示器价格上行写进渠道沟通材料，用\"主板是整机里最不涨的一环\"锚定价值；② DDIC、电源 IC 与主板 VRM 器件处在**同一供应池**，季度备料要一起锁。"
+                                           },
+                                           {
+                                               "title":  "新品端：OLED 双模下探、Mini LED 分区数翻倍（窗口内集中爆发）",
+                                               "links":  [
+                                                             {
+                                                                 "text":  "Hermitage：ROG Strix OLED XG32UQWMS / XG27AQDMG Gen2",
+                                                                 "url":  "https://www.gdm.or.jp/pressrelease/2026/1014/656102"
+                                                             },
+                                                             {
+                                                                 "text":  "Hermitage：I-O DATA LCD-GDQ271ULAQ",
+                                                                 "url":  "https://www.gdm.or.jp/pressrelease/2026/1014/656153"
+                                                             },
+                                                             {
+                                                                 "text":  "AKIBA PC Hotline：MSI MAG 321UPD E14",
+                                                                 "url":  "https://akiba-pc.watch.impress.co.jp/docs/news/news/2147333.html"
+                                                             },
+                                                             {
+                                                                 "text":  "17173/IT之家：AOC AGP277QKM",
+                                                                 "url":  "https://news.17173.com/content/10142026/160345666.shtml"
+                                                             },
+                                                             {
+                                                                 "text":  "IT之家：AOC U27U4D 开售",
+                                                                 "url":  "https://www.ithome.com/1/013/059.htm"
+                                                             },
+                                                             {
+                                                                 "text":  "IT之家：泰坦军团 U255L ULTRA",
+                                                                 "url":  "https://www.ithome.com/1/013/218.htm"
+                                                             },
+                                                             {
+                                                                 "text":  "Hermitage：MSI MAG VIEW XPANDER 12",
+                                                                 "url":  "https://www.gdm.or.jp/pressrelease/2026/1014/656144"
+                                                             }
+                                                         ],
+                                               "table_html":  "\u003ctable class=\"tbl\"\u003e\u003cthead\u003e\u003ctr\u003e\u003cth\u003e\u003cstrong\u003eMSI MAG VIEW XPANDER 12\u003c/strong\u003e\u003c/th\u003e\u003cth\u003e12.3\" IPS 副屏，可装进机箱内\u003c/th\u003e\u003cth\u003e10-14\u003c/th\u003e\u003cth\u003e机箱内副屏是整机展示的差异化点，可与高端主板/机箱套装联动\u003c/th\u003e\u003c/tr\u003e\u003c/thead\u003e\u003ctbody\u003e\u003c/tbody\u003e\u003c/table\u003e",
+                                               "why":  "① **双模（4K/240 ↔ FHD/480）已成高端显示器标准动作**，把\"高刷\"和\"高分辨率\"从二选一变成一台搞定，削弱了\"为 480Hz 再买一台屏\"的需求，反而**强化单台高端整机的价值**；② DP 2.1 UHBR13.5 / HDMI 2.1 FRL6 普及，意味着**主板 I/O、线材与整机兼容说明要跟上**；③ Mini LED 分区（1,152 → 2,304）与峰值亮度（1,400nits）持续上行，说明背光驱动与电源器件在抢**与主板 VRM 同源的供应池**。",
+                                               "advice":  "① 整机方案补一份\"主板 + 显示器\"接口兼容指引（DP 2.1/HDMI 2.1 带宽、USB-C 一线连与反向供电功率）；② 内容创作向套装可绑定 4K QD-OLED（4000 元档已可入手）；③ 关注双模显示器对主板视频输出与 USB 配置组合的影响。"
+                                           },
+                                           {
+                                               "title":  "备查：窗口内的常规上架",
+                                               "facts":  [
+                                                             "AOC Q24G4ZL/WS：23.8\" QHD 260Hz（原生 240Hz 超频）、圆偏振光护眼、DisplayHDR 400，10-13 官网上线（[IT之家](https://www.ithome.com/1/013/281.htm)，成稿 10-15 11:56，超窗口）。",
+                                                             "Philips EVNIA 27M2N3500PF：27\" 2K 260Hz Fast IPS，到手 999 元（[IT之家](https://www.ithome.com/1/013/051.htm)）。"
+                                                         ],
+                                               "links":  [
+
+                                                         ]
+                                           }
+                                       ],
+                             "html":  "\u003cblockquote\u003e显示器不在主板品牌的产品线里，但它决定\u003cstrong\u003e整机预算的剩余空间\u003c/strong\u003e：显示器吃掉的钱越多，留给主板/内存的越少；显示接口规格（DP 2.1 UHBR / HDMI 2.1 FRL）又会反向影响主板 I/O 与整机搭配话术。\u003c/blockquote\u003e"
+                         },
+                         {
+                             "title":  "四、本期过滤掉的内容（假大空 / 不可核验）",
+                             "html":  "\u003ctable class=\"tbl\"\u003e\u003cthead\u003e\u003ctr\u003e\u003cth\u003e被过滤内容\u003c/th\u003e\u003cth\u003e原因\u003c/th\u003e\u003c/tr\u003e\u003c/thead\u003e\u003ctbody\u003e\u003ctr\u003e\u003ctd\u003e\"御三家主板 10 月全面涨价 5%~15% / 近 50%\"\u003c/td\u003e\u003ctd\u003e源头是 Board Channels 论坛的供应链传闻（2026-08-04 已被 TechPowerUp / Notebookcheck 转述），\u003cstrong\u003e华硕、技嘉、微星均未官方确认\u003c/strong\u003e，且数字在不同媒体间从 5–15% 漂移到 50%，不可作为价格决策依据。仅作背景：裸 PCB 成本预计年内至少 +50%，铜、MLCC、控制芯片、电源器件同步紧张。\u003c/td\u003e\u003c/tr\u003e\u003ctr\u003e\u003ctd\u003e\"9800X3D 崩盘实录：主板烧毁背后真相\"\u003c/td\u003e\u003ctd\u003e标题党营销文（二手聚合站），无原始信源、无批次/型号证据，典型的\"情绪驱动流量文\"。\u003c/td\u003e\u003c/tr\u003e\u003ctr\u003e\u003ctd\u003e\"台系 4 大主板厂大幅下调今年出货目标，最高砍掉近 40%\"\u003c/td\u003e\u003ctd\u003e命中页面为无名商城站点，无法确认原始出处与统计口径；方向与行业趋势一致但数值不可引用。若需使用，须回溯到原始调研机构数据。\u003c/td\u003e\u003c/tr\u003e\u003ctr\u003e\u003ctd\u003e\"显卡暴涨超一倍 / 内存暴涨四倍，全球 PC 出货创历史低谷\"\u003c/td\u003e\u003ctd\u003e结论方向可能成立，但\"超一倍/四倍\"缺少统一基准（谁、哪个 SKU、现货还是合约），属于把恐慌当数据的写法。本次仅采用可核验的巴克莱/花旗分项数据。\u003c/td\u003e\u003c/tr\u003e\u003ctr\u003e\u003ctd\u003e~~一批 10 月 14 日新品（AOC/泰坦军团/飞利浦显示器等）~~ \u003cstrong\u003e修正\u003c/strong\u003e\u003c/td\u003e\u003ctd\u003e原按\"外设/显示器常规上架\"过滤。\u003cstrong\u003e本期已按需求单独增设显示器栏目（第三·补二）\u003c/strong\u003e：显示器新品成体系（见 §23），面板成本变动也已核实（见 §22），故移出过滤区。仍保留在外的是与平台搭配无关的纯促销稿：思必驰 Turbo 电纸书、TRYX 展域 SE 360 V2 等。\u003c/td\u003e\u003c/tr\u003e\u003ctr\u003e\u003ctd\u003eiPhone 18 / HomePod / 智能门锁 / 汽车类新闻\u003c/td\u003e\u003ctd\u003e与 DIY 硬件无关联，直接排除。\u003c/td\u003e\u003c/tr\u003e\u003c/tbody\u003e\u003c/table\u003e\u003ctable class=\"tbl\"\u003e\u003cthead\u003e\u003ctr\u003e\u003cth\u003e\"御三家主板 10 月全面涨价 5%~15% / 近 50%\"\u003c/th\u003e\u003cth\u003e源头是 Board Channels 论坛的供应链传闻（2026-08-04 已被 TechPowerUp / Notebookcheck 转述），\u003cstrong\u003e华硕、技嘉、微星均未官方确认\u003c/strong\u003e，且数字在不同媒体间从 5–15% 漂移到 50%，不可作为价格决策依据。仅作背景：裸 PCB 成本预计年内至少 +50%，铜、MLCC、控制芯片、电源器件同步紧张。\u003c/th\u003e\u003c/tr\u003e\u003c/thead\u003e\u003ctbody\u003e\u003ctr\u003e\u003ctd\u003e\"9800X3D 崩盘实录：主板烧毁背后真相\"\u003c/td\u003e\u003ctd\u003e标题党营销文（二手聚合站），无原始信源、无批次/型号证据，典型的\"情绪驱动流量文\"。\u003c/td\u003e\u003c/tr\u003e\u003ctr\u003e\u003ctd\u003e\"台系 4 大主板厂大幅下调今年出货目标，最高砍掉近 40%\"\u003c/td\u003e\u003ctd\u003e命中页面为无名商城站点，无法确认原始出处与统计口径；方向与行业趋势一致但数值不可引用。若需使用，须回溯到原始调研机构数据。\u003c/td\u003e\u003c/tr\u003e\u003ctr\u003e\u003ctd\u003e\"显卡暴涨超一倍 / 内存暴涨四倍，全球 PC 出货创历史低谷\"\u003c/td\u003e\u003ctd\u003e结论方向可能成立，但\"超一倍/四倍\"缺少统一基准（谁、哪个 SKU、现货还是合约），属于把恐慌当数据的写法。本次仅采用可核验的巴克莱/花旗分项数据。\u003c/td\u003e\u003c/tr\u003e\u003ctr\u003e\u003ctd\u003e~~一批 10 月 14 日新品（AOC/泰坦军团/飞利浦显示器等）~~ \u003cstrong\u003e修正\u003c/strong\u003e\u003c/td\u003e\u003ctd\u003e原按\"外设/显示器常规上架\"过滤。\u003cstrong\u003e本期已按需求单独增设显示器栏目（第三·补二）\u003c/strong\u003e：显示器新品成体系（见 §23），面板成本变动也已核实（见 §22），故移出过滤区。仍保留在外的是与平台搭配无关的纯促销稿：思必驰 Turbo 电纸书、TRYX 展域 SE 360 V2 等。\u003c/td\u003e\u003c/tr\u003e\u003ctr\u003e\u003ctd\u003eiPhone 18 / HomePod / 智能门锁 / 汽车类新闻\u003c/td\u003e\u003ctd\u003e与 DIY 硬件无关联，直接排除。\u003c/td\u003e\u003c/tr\u003e\u003c/tbody\u003e\u003c/table\u003e\u003ctable class=\"tbl\"\u003e\u003cthead\u003e\u003ctr\u003e\u003cth\u003e\"9800X3D 崩盘实录：主板烧毁背后真相\"\u003c/th\u003e\u003cth\u003e标题党营销文（二手聚合站），无原始信源、无批次/型号证据，典型的\"情绪驱动流量文\"。\u003c/th\u003e\u003c/tr\u003e\u003c/thead\u003e\u003ctbody\u003e\u003ctr\u003e\u003ctd\u003e\"台系 4 大主板厂大幅下调今年出货目标，最高砍掉近 40%\"\u003c/td\u003e\u003ctd\u003e命中页面为无名商城站点，无法确认原始出处与统计口径；方向与行业趋势一致但数值不可引用。若需使用，须回溯到原始调研机构数据。\u003c/td\u003e\u003c/tr\u003e\u003ctr\u003e\u003ctd\u003e\"显卡暴涨超一倍 / 内存暴涨四倍，全球 PC 出货创历史低谷\"\u003c/td\u003e\u003ctd\u003e结论方向可能成立，但\"超一倍/四倍\"缺少统一基准（谁、哪个 SKU、现货还是合约），属于把恐慌当数据的写法。本次仅采用可核验的巴克莱/花旗分项数据。\u003c/td\u003e\u003c/tr\u003e\u003ctr\u003e\u003ctd\u003e~~一批 10 月 14 日新品（AOC/泰坦军团/飞利浦显示器等）~~ \u003cstrong\u003e修正\u003c/strong\u003e\u003c/td\u003e\u003ctd\u003e原按\"外设/显示器常规上架\"过滤。\u003cstrong\u003e本期已按需求单独增设显示器栏目（第三·补二）\u003c/strong\u003e：显示器新品成体系（见 §23），面板成本变动也已核实（见 §22），故移出过滤区。仍保留在外的是与平台搭配无关的纯促销稿：思必驰 Turbo 电纸书、TRYX 展域 SE 360 V2 等。\u003c/td\u003e\u003c/tr\u003e\u003ctr\u003e\u003ctd\u003eiPhone 18 / HomePod / 智能门锁 / 汽车类新闻\u003c/td\u003e\u003ctd\u003e与 DIY 硬件无关联，直接排除。\u003c/td\u003e\u003c/tr\u003e\u003c/tbody\u003e\u003c/table\u003e\u003ctable class=\"tbl\"\u003e\u003cthead\u003e\u003ctr\u003e\u003cth\u003e\"台系 4 大主板厂大幅下调今年出货目标，最高砍掉近 40%\"\u003c/th\u003e\u003cth\u003e命中页面为无名商城站点，无法确认原始出处与统计口径；方向与行业趋势一致但数值不可引用。若需使用，须回溯到原始调研机构数据。\u003c/th\u003e\u003c/tr\u003e\u003c/thead\u003e\u003ctbody\u003e\u003ctr\u003e\u003ctd\u003e\"显卡暴涨超一倍 / 内存暴涨四倍，全球 PC 出货创历史低谷\"\u003c/td\u003e\u003ctd\u003e结论方向可能成立，但\"超一倍/四倍\"缺少统一基准（谁、哪个 SKU、现货还是合约），属于把恐慌当数据的写法。本次仅采用可核验的巴克莱/花旗分项数据。\u003c/td\u003e\u003c/tr\u003e\u003ctr\u003e\u003ctd\u003e~~一批 10 月 14 日新品（AOC/泰坦军团/飞利浦显示器等）~~ \u003cstrong\u003e修正\u003c/strong\u003e\u003c/td\u003e\u003ctd\u003e原按\"外设/显示器常规上架\"过滤。\u003cstrong\u003e本期已按需求单独增设显示器栏目（第三·补二）\u003c/strong\u003e：显示器新品成体系（见 §23），面板成本变动也已核实（见 §22），故移出过滤区。仍保留在外的是与平台搭配无关的纯促销稿：思必驰 Turbo 电纸书、TRYX 展域 SE 360 V2 等。\u003c/td\u003e\u003c/tr\u003e\u003ctr\u003e\u003ctd\u003eiPhone 18 / HomePod / 智能门锁 / 汽车类新闻\u003c/td\u003e\u003ctd\u003e与 DIY 硬件无关联，直接排除。\u003c/td\u003e\u003c/tr\u003e\u003c/tbody\u003e\u003c/table\u003e\u003ctable class=\"tbl\"\u003e\u003cthead\u003e\u003ctr\u003e\u003cth\u003e\"显卡暴涨超一倍 / 内存暴涨四倍，全球 PC 出货创历史低谷\"\u003c/th\u003e\u003cth\u003e结论方向可能成立，但\"超一倍/四倍\"缺少统一基准（谁、哪个 SKU、现货还是合约），属于把恐慌当数据的写法。本次仅采用可核验的巴克莱/花旗分项数据。\u003c/th\u003e\u003c/tr\u003e\u003c/thead\u003e\u003ctbody\u003e\u003ctr\u003e\u003ctd\u003e~~一批 10 月 14 日新品（AOC/泰坦军团/飞利浦显示器等）~~ \u003cstrong\u003e修正\u003c/strong\u003e\u003c/td\u003e\u003ctd\u003e原按\"外设/显示器常规上架\"过滤。\u003cstrong\u003e本期已按需求单独增设显示器栏目（第三·补二）\u003c/strong\u003e：显示器新品成体系（见 §23），面板成本变动也已核实（见 §22），故移出过滤区。仍保留在外的是与平台搭配无关的纯促销稿：思必驰 Turbo 电纸书、TRYX 展域 SE 360 V2 等。\u003c/td\u003e\u003c/tr\u003e\u003ctr\u003e\u003ctd\u003eiPhone 18 / HomePod / 智能门锁 / 汽车类新闻\u003c/td\u003e\u003ctd\u003e与 DIY 硬件无关联，直接排除。\u003c/td\u003e\u003c/tr\u003e\u003c/tbody\u003e\u003c/table\u003e\u003ctable class=\"tbl\"\u003e\u003cthead\u003e\u003ctr\u003e\u003cth\u003e~~一批 10 月 14 日新品（AOC/泰坦军团/飞利浦显示器等）~~ \u003cstrong\u003e修正\u003c/strong\u003e\u003c/th\u003e\u003cth\u003e原按\"外设/显示器常规上架\"过滤。\u003cstrong\u003e本期已按需求单独增设显示器栏目（第三·补二）\u003c/strong\u003e：显示器新品成体系（见 §23），面板成本变动也已核实（见 §22），故移出过滤区。仍保留在外的是与平台搭配无关的纯促销稿：思必驰 Turbo 电纸书、TRYX 展域 SE 360 V2 等。\u003c/th\u003e\u003c/tr\u003e\u003c/thead\u003e\u003ctbody\u003e\u003ctr\u003e\u003ctd\u003eiPhone 18 / HomePod / 智能门锁 / 汽车类新闻\u003c/td\u003e\u003ctd\u003e与 DIY 硬件无关联，直接排除。\u003c/td\u003e\u003c/tr\u003e\u003c/tbody\u003e\u003c/table\u003e\u003ctable class=\"tbl\"\u003e\u003cthead\u003e\u003ctr\u003e\u003cth\u003eiPhone 18 / HomePod / 智能门锁 / 汽车类新闻\u003c/th\u003e\u003cth\u003e与 DIY 硬件无关联，直接排除。\u003c/th\u003e\u003c/tr\u003e\u003c/thead\u003e\u003ctbody\u003e\u003c/tbody\u003e\u003c/table\u003e"
+                         },
+                         {
+                             "title":  "五、一句话结论（给管理层/产品线的五个判断）",
+                             "html":  "\u003cdiv class=\"ol-item\"\u003e\u003cspan class=\"ol-num\"\u003e1.\u003c/span\u003e\u003cstrong\u003e平台寿命 \u0026gt; 平台换代\u003c/strong\u003e：DDR5 仍在高位、CPU 三连涨的当下，\"换 U 不换板\"是唯一能打的增量故事。技嘉已经用一张 BIOS 名单抢了先手，我方必须在 1–2 周内给出对等或更宽（含 Z690/B660）的兼容承诺，否则这波存量换 U 需求会全部流给对手。\u003c/div\u003e\u003cdiv class=\"ol-item\"\u003e\u003cspan class=\"ol-num\"\u003e2.\u003c/span\u003e\u003cstrong\u003eDDR4 省钱逻辑正在失效\u003c/strong\u003e：DDR4 三个月涨幅（+24%）反超 DDR5（+20%），DDR4 SKU 的\"便宜\"卖点必须重新定价与重新备货，否则会同时踩中\"卖不动\"和\"渠道压货\"两个坑。\u003c/div\u003e\u003cdiv class=\"ol-item\"\u003e\u003cspan class=\"ol-num\"\u003e3.\u003c/span\u003e\u003cstrong\u003e高端超频板的天花板已现\u003c/strong\u003e：800 美元级 X870 超频板被权威评测质疑定价（对比 X870E 对手），叠加内存天价，高端 SKU 的立项与价格带需要收敛；把资源转到主流段的内存兼容性、M.2 温控与售后体验，回报率更高。\u003c/div\u003e\u003cdiv class=\"ol-item\"\u003e\u003cspan class=\"ol-num\"\u003e4.\u003c/span\u003e\u003cstrong\u003e整机预算的\"第四条成本曲线\"已经形成\u003c/strong\u003e：内存（+20~24%/3 个月）→ CPU（+10~20%）→ 显卡（GDDR6 涨价）→ 显示器（面板调价函 + 电竞屏均价同比 +7%），四条线同时上行。\u003cstrong\u003e主板是唯一还没明显涨价的一环\u003c/strong\u003e——这既是机会（用\"最不涨\"锚定价值、做套装），也是风险（渠道会拿主板做让利换量，进一步压毛利）。显示侧的应对是把它变成搭配卖点：双模 OLED/Mini LED 普及后，\"一台屏 + 一台好主板\"就能覆盖高刷与高分辨率，整机方案里把接口兼容（DP 2.1/HDMI 2.1/USB-C 96W）写清楚即可。\u003c/div\u003e\u003cdiv class=\"ol-item\"\u003e\u003cspan class=\"ol-num\"\u003e5.\u003c/span\u003e\u003cstrong\u003e光追从\"画质选项\"变成了\"硬件门槛\"，这是本轮最强的换机催化剂\u003c/strong\u003e：《战争机器：事变日》把硬件光追做成关不掉的常开项，GTX 10 系及更早显卡直接进不去——这把一部分用户的决策从\"等 DDR5 降价\"改成了\"必须换平台\"。同时实测显示 CPU 占用 80–90%、内存占用 16–20GB，\u003cstrong\u003e瓶颈已经落在 CPU 与内存子系统上\u003c/strong\u003e，这正是主板价值最好讲的地方。建议：① 做\"光追门槛自查\"渠道工具，把老卡用户直接导向主板+CPU+内存套装；② 物料主推\"32GB 起 + 低延迟预设\"，用真实占用数据支撑；③ 与《奇点灰烬 II》（11/10）这类多核吃满的作品联动，强化\"换 U 就能续命\"的叙事。另外注意分层：窗口内《爆矢枪 2》《太吾异世劫》门槛极低（GTX 1650 / UHD 770 即可），说明 PC 市场正按硬件门槛分裂成两极，产品与话术要分开做。\u003c/div\u003e"
+                         },
+                         {
+                             "title":  "附：下期需要追踪的线索（挂账）",
+                             "html":  "\u003cdiv class=\"todo-item\"\u003e技嘉之后，华硕 / 微星 / 华擎是否跟进 LGA1700 新 CPU BIOS；是否覆盖 600 系（Z690/B660）。\u003c/div\u003e\u003cdiv class=\"todo-item\"\u003eLGA1954 + Q970/B960 消费级主板的首家官宣（关注 11 月–12 月预热窗口）。\u003c/div\u003e\u003cdiv class=\"todo-item\"\u003e十铨/金士顿等模组厂的 DDR4 供货策略变化（是否跟南亚科一样\"不急转 DDR5\"）。\u003c/div\u003e\u003cdiv class=\"todo-item\"\u003eIntel / AMD CPU 涨价是否有官方调价函落地（当前仅为供应链爆料）。\u003c/div\u003e\u003cdiv class=\"todo-item\"\u003e主板厂商是否发布正式涨价通知（Board Channels 传闻的官方化验证）。\u003c/div\u003e\u003cdiv class=\"todo-item\"\u003eKB5127648 相关客诉是否扩散到网卡/主板厂售后。\u003c/div\u003e\u003cdiv class=\"todo-item\"\u003eSOCAMM2 / LPDDR6 模组是否从笔电与边缘设备走向桌面与 MoDT 主板（关注内存厂与工作站厂商动作）。\u003c/div\u003e\u003cdiv class=\"todo-item\"\u003e本地 AI 推理（CPU-only / 大内存路线）是否形成可量化的主板增量需求。\u003c/div\u003e\u003cdiv class=\"todo-item\"\u003e面板厂 10 月调价函是否落地为\u003cstrong\u003e显示器品牌官方调价\u003c/strong\u003e（当前 MNT 面板 TrendForce 口径为\"持平\"，重点看 11 月是否跟涨电视面板）。\u003c/div\u003e\u003cdiv class=\"todo-item\"\u003e双模显示器（4K/240 ↔ FHD/480）价格下探速度，以及它是否开始替代\"双屏\"装机方案。\u003c/div\u003e\u003cdiv class=\"todo-item\"\u003eDP 2.1 UHBR13.5 / HDMI 2.1 FRL6 在 4000 元档以下机型的渗透率（影响主板 I/O 与线材搭配话术）。\u003c/div\u003e\u003cdiv class=\"todo-item\"\u003e\"必须硬件光追\"是否会成为 2027 年 3A 的普遍门槛（《事变日》之后跟进的厂商与作品）。\u003c/div\u003e\u003cdiv class=\"todo-item\"\u003e《地铁 2039》最终 PC 配置公布（当前为误上传，重点看内存与显存门槛）。\u003c/div\u003e\u003cdiv class=\"todo-item\"\u003e《奇点灰烬 II》11/10 发售后的多核与内存带宽实测（能否成为\"老平台换新 U\"的说服素材）。\u003c/div\u003e\u003cdiv class=\"todo-item\"\u003eGTA 6 评测解禁与发售（11/19）对整机咨询量的实际拉动幅度。\u003c/div\u003e"
+                         }
+                     ],
+        "id":  "2026-10-15",
+        "label":  "2026-10-15（周四）"
+    },
+    {
+        "dateLabel":  "2026-10-16（周五）",
+        "window":  "北京时间 2026-10-15 00:00 — 2026-10-16 09:00",
+        "note":  "Web 搜索接口持续鉴权失败（401），无法按分区做全量回溯，本期仅录入**已核实**条目，缺项在文末说明，不硬凑。",
+        "preamble":  "",
+        "sections":  [
+                         {
+                             "title":  "一、成本与供应链（对 BOM 与定价最直接的硬约束）",
+                             "kind":  "items",
+                             "items":  [
+                                           {
+                                               "title":  "32GB DDR5 套件 13 个月涨幅 434.2%（OC3D 追踪英国亚马逊）",
+                                               "facts":  [
+                                                             "OC3D 10-15 追踪英国亚马逊显示，Crucial Pro DDR5-6000 32GB（2×16GB CL36）套件价格在约 13 个月内上涨 **434.2%**，已\"比肩甚至超过旗舰 CPU\"。IT之家 10-16 早报收录。",
+                                                             "【时间】原始 2026-10-15（OC3D），中文媒体 10-16 收录。"
+                                                         ],
+                                               "links":  [
+                                                             {
+                                                                 "text":  "IT之家早报 1016",
+                                                                 "url":  "https://www.ithome.com/1/013/710.htm"
+                                                             },
+                                                             {
+                                                                 "text":  "IT之家",
+                                                                 "url":  "https://www.ithome.com/1/013/385.htm"
+                                                             }
+                                                         ],
+                                               "why":  "这是把\"内存涨疯了\"从抽象变成**单一 SKU 的硬数字**。434% 意味着内存已经从\"配件\"变成整机预算里弹性最大的项，用户会优先砍显卡/主板预算去保内存容量。对主板品牌的意义：高端主板的\"内存容量/带宽\"卖点还能讲，但**主流段会被内存价格反向压迫**，套装与\"内存绑主板\"的联合促销权重必须上调。",
+                                               "advice":  "① 与模组厂谈\"主板+内存\"锁价套装，用联采对冲零售涨幅；② 渠道沟通里把\"主板是整机最不涨的一环\"做成标准化说辞；③ Q4–Q1 的出货假设按内存高位做保守下修。",
+                                               "source_note":  "原文条目"
+                                           },
+                                           {
+                                               "title":  "日本市场 RTX 5060 Ti 16GB 零售价暴涨 144%",
+                                               "facts":  [
+                                                             "日本市场 RTX 50 系显卡价格飙升，其中 RTX 5060 Ti 16GB 涨幅达 144%、最高约 20 万日元（约 9738 元人民币）；RTX 5080 突破 38.56 万日元（约 1.6 万元人民币）。",
+                                                             "【时间】快科技 2026-10-15 17:00（**窗口内**）。"
+                                                         ],
+                                               "links":  [
+                                                             {
+                                                                 "text":  "快科技",
+                                                                 "url":  "https://news.mydrivers.com/1/1157/1157750.htm"
+                                                             }
+                                                         ],
+                                               "why":  "显存（GDDR）高端型号被 AI 市场与涨价通道双重挤压，\"显存容量 = 资产\"的定价逻辑在中端卡上显性化。显卡侧涨价会进一步压缩\"主板+显卡\"套装的让利空间。",
+                                               "advice":  "套装报价有效期缩短（30 天→7–14 天）；显卡涨价的周期里，主板的促销锚点价值上升，但要注意别被渠道拿来对冲显卡亏损。"
+                                           },
+                                           {
+                                               "title":  "黄仁勋：AI 芯片供不应求，订单\"几乎每日持续涌入\"",
+                                               "facts":  [
+                                                             "黄仁勋在 10-15 的 BG2 播客访谈中称，客户对 AI 芯片订购需求持续超过供应能力，新订单\"几乎每周、甚至每天\"涌入。",
+                                                             "【时间】快科技 2026-10-16 08:52（窗口内，早间）。"
+                                                         ],
+                                               "links":  [
+                                                             {
+                                                                 "text":  "快科技",
+                                                                 "url":  "https://news.mydrivers.com/1/1157/1157886.htm"
+                                                             }
+                                                         ],
+                                               "why":  "AI 对晶圆/封装/存储产能的持续虹吸仍在加速，这是所有消费级硬件（主板用料、显存、DRAM）成本上行的底层原因；它不直接作用于主板，但决定了未来 2–3 个季度的供应紧张基调不变。",
+                                               "advice":  "把这句作为供应链沟通的\"基准背景\"固定引用；季度备料继续按紧张情景执行。"
+                                           }
+                                       ]
+                         },
+                         {
+                             "title":  "二、生产力与系统（影响装机与售后的软侧）",
+                             "kind":  "items",
+                             "items":  [
+                                           {
+                                               "title":  "微软宣布优化 Win11 内存管理：响应速度最高提升 20%，8GB 设备明显受益",
+                                               "facts":  [
+                                                             "微软宣布优化 Windows 11 内存管理，8GB 及以下内存设备获益明显、响应速度最高提升 20%；同期新增任务栏自定义、新版搜索等；Xbox 25 周年活动 11 月开启，美国部分渠道购指定 Win11 电脑可领免费游戏合集。",
+                                                             "【时间】IT之家 2026-10-15 晚间（早报 1016 第 3 条）。"
+                                                         ],
+                                               "links":  [
+                                                             {
+                                                                 "text":  "IT之家早报 1016",
+                                                                 "url":  "https://www.ithome.com/1/013/710.htm"
+                                                             },
+                                                             {
+                                                                 "text":  "IT之家",
+                                                                 "url":  "https://www.ithome.com/1/013/677.htm"
+                                                             }
+                                                         ],
+                                               "why":  "这是\"软件侧给低配续命\"的利好，与\"高内存涨价\"形成对冲——**8GB/16GB 的老机器有了不被淘汰的技术理由**，也间接支撑\"换 U 不换板、老平台续命\"的叙事。对高端内存容量卖点是轻微反向作用力，但对存量市场的换机焦虑是缓解，整体对主板出货是中性偏正。",
+                                               "advice":  "售后话术里补一条\"Win11 内存优化生效后，8GB/16GB 仍可服役\"的引导，降低用户因内存涨价而整体放弃升级的概率。",
+                                               "source_note":  "原文条目"
+                                           }
+                                       ]
+                         },
+                         {
+                             "title":  "三、AI 与本地计算（装机需求的潜在拉动）",
+                             "kind":  "items",
+                             "items":  [
+                                           {
+                                               "title":  "苹果 Minions 研究：聚合闲置 Mac GPU 组成\"虚拟 GPU 云\"跑 AI 推理",
+                                               "facts":  [
+                                                             "苹果研究团队公布 Minions 方案，聚合多台闲置 Mac 的 Apple Silicon GPU，动态调度成\"虚拟 GPU 云\"运行 ML 推理；测试显示原先排队超 10 小时的任务可在数分钟内开始执行；当前是企业内部研究/工程方案而非消费者产品，数据治理是主要顾虑。",
+                                                             "【时间】AppleInsider 2026-10-15，IT之家 10-16 收录。"
+                                                         ],
+                                               "links":  [
+                                                             {
+                                                                 "text":  "IT之家",
+                                                                 "url":  "https://www.ithome.com/1/013/730.htm"
+                                                             },
+                                                             {
+                                                                 "text":  "arXiv",
+                                                                 "url":  "https://arxiv.org/pdf/2610.12970"
+                                                             }
+                                                         ],
+                                               "why":  "这是\"端侧/边缘算力复用\"路线的信号——如果\"多台小设备凑算力\"成立，会弱化\"必须买顶级独显\"的叙事，但**同时强化\"本地有真可用算力\"的总需求**。对 DIY 的直接拉动有限，但值得把\"本地 AI 推理对内存容量的需求\"继续作为高端主板卖点跟踪。",
+                                               "source_note":  "论文"
+                                           },
+                                           {
+                                               "title":  "Meta 发布开源大模型 Muse Spark Open，与苹果合作推动 Mac 本地运行（\"两台苹果电脑就能跑\"）",
+                                               "facts":  [
+                                                             "Meta 发布混合专家架构开放权重模型 Muse Spark Open，并与苹果合作推动在 Mac 上本地运行；媒体口径\"两台苹果电脑即可本地运行\"。",
+                                                             "【时间】快科技 2026-10-16 08:47（窗口内）。"
+                                                         ],
+                                               "links":  [
+                                                             {
+                                                                 "text":  "快科技",
+                                                                 "url":  "https://news.mydrivers.com/1/1157/1157884.htm"
+                                                             }
+                                                         ],
+                                               "why":  "端侧大模型的门槛（内存+显存需求）继续被压缩，本地 AI 对\"高内存容量\"的依赖被部分稀释，但对\"高频宽、大容量统一内存\"的需求方向不变——这正是未来 CUDIMM/大容量 DIMM 与高端主板的结合点。",
+                                               "credibility":  "权威媒体（快科技转述，模型规格待核实）。"
+                                           }
+                                       ]
+                         },
+                         {
+                             "title":  "四、本期未采用的信息 · 核实说明",
+                             "html":  "\u003cp\u003e主板 / 显示器：本窗口未见\u003cstrong\u003e已确认\u003c/strong\u003e的主板或显示器官方级动作；因搜索接口不可用，无法确认是否漏采，\u003cstrong\u003e不凭记忆硬补\u003c/strong\u003e。\u003c/p\u003e\u003cp\u003e游戏硬件门槛/配置要求：本窗口的 IT 资讯以手机/汽车/公司动态为主，未见影响装机门槛的新作配置或性能实测（11/19《GTA 6》发售临近，持续跟踪中但本期无新门槛披露）。\u003c/p\u003e\u003cp\u003e涉及具体涨跌幅、销量、跑分或出货目标的数字：均需当日可核验出处，本期仅采用 OC3D（DDR5 涨幅）、日本零售价（RTX 5060 Ti）两条有明确来源的数据。\u003c/p\u003e"
+                         },
+                         {
+                             "title":  "附：下期追踪线索（挂账）",
+                             "html":  "\u003cdiv class=\"todo-item\"\u003e搜索接口恢复后，补 10/15 全天的主板/显示器/游戏三条线（当前判断为\"未覆盖\"而非\"无事发生\"）。\u003c/div\u003e\u003cdiv class=\"todo-item\"\u003e微软 Win11 内存优化落地后的真实响应增益实测（8GB/16GB 场景），评估对\"老平台续命\"叙事的实际支撑。\u003c/div\u003e\u003cdiv class=\"todo-item\"\u003e内存涨价进入\"堪比旗舰 CPU\"阶段后，渠道端是否出现\"显卡/主板让利换内存\"的套装结构变化。\u003c/div\u003e\u003cdiv class=\"todo-item\"\u003eMeta Muse Spark Open 的本地运行硬件门槛（内存/显存规格），判断对 CUDIMM/大容量 DIMM 需求的真实拉动。\u003c/div\u003e"
+                         }
+                     ],
+        "id":  "2026-10-16",
+        "label":  "2026-10-16（周五）"
+    }
+];
+
+function el(tag, cls, html) {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (html != null) e.innerHTML = html;
+  return e;
+}
+
+function esc(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// 正文内联 markdown：链接 [文字](url) + 粗体 **文字**（先 esc 再转）
+function mdInline(s) {
+  let t = esc(s);
+  t = t.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)\]]+)\)/g,
+    '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+  t = t.replace(/\*\*([^*\n]+)\*\*/g, '<strong>$1</strong>');
+  return t;
+}
+
+function renderLinks(links) {
+  const box = el('div','links');
+  box.appendChild(el('span','l-label','出处：'));
+  links.forEach(l => {
+    const a = el('a', null, esc(l.text || '来源'));
+    a.href = l.url; a.target = '_blank'; a.rel = 'noopener noreferrer';
+    box.appendChild(a);
+  });
+  return box;
+}
+
+function renderField(label, text, cls) {
+  const d = el('div', 'field ' + cls);
+  d.appendChild(el('span','flabel', label));
+  d.appendChild(el('span','fbody', mdInline(text)));
+  return d;
+}
+
+function renderItem(it) {
+  const card = el('div', 'card');
+  card.appendChild(el('div','title', esc(it.title)));
+  (it.facts || []).forEach(f => {
+    if (f.indexOf('【时间】') === 0) {
+      const d = el('div','fact time');
+      d.appendChild(el('span','tlabel','时间'));
+      d.appendChild(el('span', null, mdInline(f.slice(4))));
+      card.appendChild(d);
+    } else {
+      card.appendChild(el('div','fact', mdInline(f)));
+    }
+  });
+  if (it.why) card.appendChild(renderField('为什么重要', it.why, 'why'));
+  if (it.advice) card.appendChild(renderField('我方动作建议', it.advice, 'advice'));
+  if (it.credibility) card.appendChild(renderField('可信度分级', it.credibility, 'cred'));
+  if (it.table_html) {
+    const w = el('div','tablewrap');
+    w.innerHTML = it.table_html;
+    card.appendChild(w);
+  }
+  if (it.source_note) card.appendChild(el('div','srcnote', esc(it.source_note)));
+  if (it.links && it.links.length) card.appendChild(renderLinks(it.links));
+  return card;
+}
+
+function renderSection(sec) {
+  const s = el('section','section');
+  const head = el('div','sec-head');
+  head.appendChild(el('span','dot'));
+  head.appendChild(el('h2', null, esc(sec.title)));
+
+  if (sec.items && sec.items.length) {
+    head.appendChild(el('span','n', sec.items.length + ' 条'));
+    s.appendChild(head);
+    const grid = el('div','grid');
+    sec.items.forEach(it => grid.appendChild(renderItem(it)));
+    s.appendChild(grid);
+  } else if (sec.html) {
+    head.appendChild(el('span','n','说明'));
+    s.appendChild(head);
+    const body = el('div','htmlsec');
+    body.innerHTML = sec.html;
+    s.appendChild(body);
+  } else {
+    return null;
+  }
+  return s;
+}
+
+function renderDay(d) {
+  const frag = document.createDocumentFragment();
+  (d.sections || []).forEach(sec => {
+    const s = renderSection(sec);
+    if (s) frag.appendChild(s);
+  });
+  return frag;
+}
+
+function showDay(d) {
+  const c = document.getElementById('content');
+  c.innerHTML = '';
+  const box = el('div');
+  if (d.window) box.appendChild(el('div','day-window', esc(d.window)));
+  if (d.note) box.appendChild(el('div','day-note', esc(d.note)));
+  box.appendChild(renderDay(d));
+  c.appendChild(box);
+}
+
+function showAll() {
+  const ds = window.DIGESTS || [];
+  const c = document.getElementById('content');
+  c.innerHTML = '';
+  const box = el('div');
+  ds.forEach(d => {
+    box.appendChild(el('div','day-marker', esc(d.label || '')));
+    if (d.window) box.appendChild(el('div','day-window', esc(d.window)));
+    if (d.note) box.appendChild(el('div','day-note', esc(d.note)));
+    box.appendChild(renderDay(d));
+  });
+  c.appendChild(box);
+}
+
+function render() {
+  const ds = window.DIGESTS || [];
+  const sw = document.getElementById('daySwitch');
+  sw.innerHTML = '';
+
+  const allBtn = el('button','btn day-tab active','全部');
+  allBtn.onclick = () => {
+    sw.querySelectorAll('.day-tab').forEach(x => x.classList.remove('active'));
+    allBtn.classList.add('active');
+    showAll();
+  };
+  sw.appendChild(allBtn);
+
+  ds.forEach(d => {
+    const b = el('button','btn day-tab', esc(d.label));
+    b.onclick = () => {
+      sw.querySelectorAll('.day-tab').forEach(x => x.classList.remove('active'));
+      b.classList.add('active');
+      showDay(d);
+    };
+    sw.appendChild(b);
+  });
+
+  showAll();
+}
+render();
+</script>
+</body>
+</html>
